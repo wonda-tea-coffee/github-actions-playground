@@ -1,6 +1,8 @@
 name: learn-github-actions
 on:
+  # 任意のブランチへのpush
   push:
+  # マージ先がmainへのPRが開かれた場合
   pull_request:
     types: [opened]
     branches: [main]
