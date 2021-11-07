@@ -8,9 +8,9 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v1
       - uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 3.0.2
       - name: rubocop
         uses: reviewdog/action-rubocop@v2
         with:
           reporter: github-pr-review # Default is github-pr-check
+          fail_on_error: true
+          reviewdog_flags: --guess
