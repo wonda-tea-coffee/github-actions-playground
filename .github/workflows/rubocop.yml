@@ -5,6 +5,7 @@ jobs:
     name: runner / rubocop
     runs-on: ubuntu-latest
     steps:
+      - run: cat $GITHUB_EVENT_PATH
       - name: Check out code
         uses: actions/checkout@v1
       - uses: ruby/setup-ruby@v1
