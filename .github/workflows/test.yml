@@ -1,0 +1,22 @@
+name: test
+
+on:
+  pull_request:
+
+env:
+  SHOULD_EXIT: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check condition and exit if true
+        run: |
+          if [ "$SHOULD_EXIT" = "true" ]; then
+            echo "Exiting early due to condition."
+            exit 0
+          fi
+          echo "Continuing with the rest of the job."
+
+      - name: Run additional steps if not exited
+        run: echo "This step runs only if the job did not exit early."
