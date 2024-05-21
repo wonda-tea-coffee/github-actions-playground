@@ -1,0 +1,13 @@
+name: test
+
+on:
+  pull_request:
+
+env:
+  HAI: ${{ !github.event.pull_request.draft && github.actor == 'wonda-tea-coffee' }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo $HAI
