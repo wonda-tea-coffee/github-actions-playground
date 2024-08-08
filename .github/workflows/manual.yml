@@ -1,6 +1,8 @@
 on:
-  - workflow_dispatch
-  - push
+  workflow_dispatch:
+  schedule:
+    - cron: '39 * * * 1-5' # 平日毎時39分 (JST)
+
 jobs:
   run:
     runs-on: ubuntu-latest
