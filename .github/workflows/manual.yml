@@ -1,11 +1,11 @@
 on:
   workflow_dispatch:
   schedule:
-    - cron: '10 * * * 1-5' # 平日毎時39分 (JST)
+    - cron: '25 * * * 1-5' # 平日毎時39分 (JST)
 
 jobs:
   run:
     runs-on: ubuntu-latest
     steps:
-      - name: triggering_actor
-        run: echo ${{ github.triggering_actor }}
+      - name: event_name
+        run: echo ${{ github.event_name }}
