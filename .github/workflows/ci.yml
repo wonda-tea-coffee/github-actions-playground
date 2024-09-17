@@ -1,0 +1,15 @@
+on:
+  push:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: envsubst
+        run: |
+          echo 'echo hello $NAME' > greeting.tmpl
+          envsubst < greeting.tmpl > greeting
+        env:
+          NAME: wonda-tea-coffee
+      - name: out
+        run: cat greeting
