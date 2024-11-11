@@ -40,7 +40,7 @@ jobs:
             }" | \
             jq -r '.data.search.edges[].node.url')
 
-          echo "$discussion_urls" >> $GITHUB_OUTPUT
+          echo "discussion_urls=$discussion_urls" >> $GITHUB_OUTPUT
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
