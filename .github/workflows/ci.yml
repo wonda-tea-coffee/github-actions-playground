@@ -40,7 +40,12 @@ jobs:
             }" | \
             jq -r '.data.search.edges[].node.url')
 
+          # 改行を扱うための処理
+          # 参考: https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/workflow-commands-for-github-actions#example-of-a-multiline-string
           echo "discussion_urls=$discussion_urls" >> $GITHUB_OUTPUT
+          echo "discussion_urls<<EOF" >> $GITHUB_OUTPUT
+          echo "$discussion_urls" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
