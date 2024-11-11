@@ -48,10 +48,10 @@ jobs:
         name: Build Slack Message
         run: |
           if [ -z "${{ env.DISCUSSION_URLS }}" ]; then
-            echo "message=対象のDiscussionはありませんでした" >> $GITHUB_OUTPUT
+            echo "message=直近1週間でオープンされたDiscussionはありませんでした" >> $GITHUB_OUTPUT
           else
-            message=$(echo ${{ env.DISCUSSION_URLS }} | sed 's/ /\n/g')
-            echo "message=$message" >> $GITHUB_OUTPUT
+            urls=$(echo ${{ env.DISCUSSION_URLS }} | sed 's/ /\n/g')
+            echo "message=直近1週間でオープンされたDiscussionをお知らせします\n$urls" >> $GITHUB_OUTPUT
           fi
         env:
           DISCUSSION_URLS: ${{ steps.get-discussions.outputs.discussion_urls }}
@@ -71,7 +71,7 @@ jobs:
         with:
           payload: |
             {
-              "text": "Discussionの取得～通知に失敗しました。"
+              "text": "Discussionの取得に失敗しました。"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
