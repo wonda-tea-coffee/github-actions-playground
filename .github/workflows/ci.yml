@@ -51,7 +51,7 @@ jobs:
           if [ -z "${{ env.DISCUSSION_URLS }}" ]; then
             echo "message=直近1週間でオープンされたDiscussionはありませんでした" >> $GITHUB_OUTPUT
           else
-            echo "message=直近1週間でオープンされたDiscussionをお知らせします\n$urls" >> $GITHUB_OUTPUT
+            echo "message=直近1週間でオープンされたDiscussionをお知らせします\n${{ env.DISCUSSION_URLS }}" >> $GITHUB_OUTPUT
           fi
         env:
           DISCUSSION_URLS: ${{ steps.get-discussions.outputs.discussion_urls }}
