@@ -20,58 +20,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - id: get-discussions
-        name: Get Discussions
-        run: |
-          LAST_WEEK=$(date --date='7 days ago' +%Y-%m-%d)
-          SEARCH_QUERY="repo:$GITHUB_REPOSITORY is:open created:>=$LAST_WEEK"
-
-          discussion_urls=$(gh api graphql -f query="
-            {
-              search(query: \"$SEARCH_QUERY\", type: DISCUSSION, first: 100) {
-                edges {
-                  node {
-                    ... on Discussion {
-                      url
-                    }
-                  }
-                }
-              }
-            }" | \
-            jq -r '.data.search.edges[].node.url' | \
-            perl -pe 's/\n/\\n/g')
-
-          echo "discussion_urls=$discussion_urls" >> $GITHUB_OUTPUT
+      - run: echo "${{ env.GITHUB_CONTEXT }}"
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - id: build-slack-message
-        name: Build Slack Message
-        run: |
-          if [ -z "${{ env.DISCUSSION_URLS }}" ]; then
-            echo "message=直近1週間でオープンされたDiscussionはありませんでした" >> $GITHUB_OUTPUT
-          else
-            echo "message=直近1週間でオープンされたDiscussionをお知らせします\n${{ env.DISCUSSION_URLS }}" >> $GITHUB_OUTPUT
-          fi
-        env:
-          DISCUSSION_URLS: ${{ steps.get-discussions.outputs.discussion_urls }}
-
-      - name: Notify Slack
-        uses: slackapi/slack-github-action@v1.27.0
-        with:
-          payload: |
-            { "text": "${{ env.MESSAGE }}" }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-          MESSAGE: ${{ steps.build-slack-message.outputs.message }}
-
-      - name: Post failure message to a Slack channel
-        if: failure()
-        uses: slackapi/slack-github-action@v1.27.0
-        with:
-          payload: |
-            {
-              "text": "Discussionの取得に失敗しました。"
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          GITHUB_CONTEXT: ${{ toJson(github) }}

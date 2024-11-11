@@ -16,4 +16,5 @@ gh api graphql -f query="
       }
     }
   }" | \
+  # jqですよ
   jq -r '.data.search.edges[].node.url'
