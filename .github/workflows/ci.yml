@@ -52,9 +52,9 @@ jobs:
           if [ -z "${{ env.DISCUSSION_URLS }}" ]; then
             echo "message=直近1週間でオープンされたDiscussionはありませんでした" >> $GITHUB_OUTPUT
           else
-            echo "message=直近1週間でオープンされたDiscussionをお知らせします" >> $GITHUB_OUTPUT
-            echo 'urls<<EOF' >> $GITHUB_OUTPUT
-            echo $urls >> $GITHUB_OUTPUT
+            echo 'message<<EOF' >> $GITHUB_OUTPUT
+            echo '直近1週間でオープンされたDiscussionをお知らせします' >> $GITHUB_OUTPUT
+            echo $message >> $GITHUB_OUTPUT
             echo 'EOF' >> $GITHUB_OUTPUT
           fi
         env:
