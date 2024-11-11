@@ -17,9 +17,9 @@ permissions: {}
 
 jobs:
   notify:
+    env:
+      MESSAGE_PREFIX: "【${{ github.event.repository.name }}】"
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - run: echo "${{ env.REPO }}"
-        env:
-          REPO: ${{ github.event.repository.name }}
+      - run: echo "${{ env.MESSAGE_PREFIX }}"
