@@ -38,7 +38,8 @@ jobs:
                 }
               }
             }" | \
-            jq -r '.data.search.edges[].node.url')
+            jq -r '.data.search.edges[].node.url' | \
+            perl -pe 's/\n/\\n/g')
 
           echo "discussion_urls=$discussion_urls" >> $GITHUB_OUTPUT
         env:
@@ -50,7 +51,6 @@ jobs:
           if [ -z "${{ env.DISCUSSION_URLS }}" ]; then
             echo "message=直近1週間でオープンされたDiscussionはありませんでした" >> $GITHUB_OUTPUT
           else
-            urls=$(echo "${{ env.DISCUSSION_URLS }}" | sed 's/ /\n/g')
             echo "message=直近1週間でオープンされたDiscussionをお知らせします\n$urls" >> $GITHUB_OUTPUT
           fi
         env:
