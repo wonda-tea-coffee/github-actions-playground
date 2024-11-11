@@ -1,8 +1,64 @@
+name: Notify Discussions
+
 on:
   push:
+  # schedule:
+  #   - cron: '30 00 * * 1-5' # 平日09:30 (JST)
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+permissions: {}
 
 jobs:
-  run:
+  notify:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-      - run: env
+      - id: get-discussions
+        name: Get Discussions
+        run: |
+          LAST_WEEK=$(date --date='7 days ago' +%Y-%m-%d)
+          SEARCH_QUERY="repo:$GITHUB_REPOSITORY is:open created:>=$LAST_WEEK"
+
+          discussion_urls=$(gh api graphql -f query="
+            {
+              search(query: \"$SEARCH_QUERY\", type: DISCUSSION, first: 100) {
+                edges {
+                  node {
+                    ... on Discussion {
+                      url
+                    }
+                  }
+                }
+              }
+            }" | \
+            jq -r '.data.search.edges[].node.url')
+
+          echo "discussion_urls=$discussion_urls" >> $GITHUB_OUTPUT
+
+      - id: build-slack-message
+        name: Build Slack Message
+        run: |
+          if [ -z $DISCUSSION_URLS ]; then
+            echo "message='対象のDiscussionはありませんでした'" >> $GITHUB_OUTPUT
+          else
+            message=$(echo $DISCUSSION_URLS | sed 's/ /\n/g')
+            echo "message=$message" >> $GITHUB_OUTPUT
+          fi
+        env:
+          DISCUSSION_URLS: ${{ steps.get-discussions.outputs.discussion_urls }}
+
+      - name: Notify Slack
+        uses: slackapi/slack-github-action@v1.27.0
+        with:
+          payload: |
+            { "text": "$MESSAGE" }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          MESSAGE: ${{ steps.build-slack-message.outputs.message }}
