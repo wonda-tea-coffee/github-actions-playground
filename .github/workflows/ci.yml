@@ -47,8 +47,8 @@ jobs:
       - id: build-slack-message
         name: Build Slack Message
         run: |
-          if [ -z ${{ env.DISCUSSION_URLS }} ]; then
-            echo "message='対象のDiscussionはありませんでした'" >> $GITHUB_OUTPUT
+          if [ -z "${{ env.DISCUSSION_URLS }}" ]; then
+            echo "message=対象のDiscussionはありませんでした" >> $GITHUB_OUTPUT
           else
             message=$(echo ${{ env.DISCUSSION_URLS }} | sed 's/ /\n/g')
             echo "message=$message" >> $GITHUB_OUTPUT
