@@ -39,7 +39,7 @@ jobs:
               }
             }" | \
             jq -r '.data.search.edges[].node.url' | \
-            sed 's/ /\n/g')
+            sed 's/ /\\n/g')
 
           echo "$discussion_urls" >> $GITHUB_OUTPUT
         env:
