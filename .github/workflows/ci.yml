@@ -40,9 +40,7 @@ jobs:
             }" | \
             jq -r '.data.search.edges[].node.url')
 
-          echo 'discussion_urls<<EOF' >> $GITHUB_OUTPUT
-          echo $discussion_urls >> $GITHUB_OUTPUT
-          echo 'EOF' >> $GITHUB_OUTPUT
+          echo "discussion_urls=$discussion_urls" >> $GITHUB_OUTPUT
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -52,10 +50,8 @@ jobs:
           if [ -z "${{ env.DISCUSSION_URLS }}" ]; then
             echo "message=直近1週間でオープンされたDiscussionはありませんでした" >> $GITHUB_OUTPUT
           else
-            echo 'message<<EOF' >> $GITHUB_OUTPUT
-            echo '直近1週間でオープンされたDiscussionをお知らせします' >> $GITHUB_OUTPUT
-            echo $message >> $GITHUB_OUTPUT
-            echo 'EOF' >> $GITHUB_OUTPUT
+            urls=$(echo "${{ env.DISCUSSION_URLS }}" | sed 's/ /\n/g')
+            echo "message=直近1週間でオープンされたDiscussionをお知らせします\n$urls" >> $GITHUB_OUTPUT
           fi
         env:
           DISCUSSION_URLS: ${{ steps.get-discussions.outputs.discussion_urls }}
