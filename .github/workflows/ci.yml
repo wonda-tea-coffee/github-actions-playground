@@ -47,10 +47,10 @@ jobs:
       - id: build-slack-message
         name: Build Slack Message
         run: |
-          if [ -z $DISCUSSION_URLS ]; then
+          if [ -z ${{ env.DISCUSSION_URLS }} ]; then
             echo "message='対象のDiscussionはありませんでした'" >> $GITHUB_OUTPUT
           else
-            message=$(echo $DISCUSSION_URLS | sed 's/ /\n/g')
+            message=$(echo ${{ env.DISCUSSION_URLS }} | sed 's/ /\n/g')
             echo "message=$message" >> $GITHUB_OUTPUT
           fi
         env:
@@ -60,7 +60,18 @@ jobs:
         uses: slackapi/slack-github-action@v1.27.0
         with:
           payload: |
-            { "text": "$MESSAGE" }
+            { "text": "${{ env.MESSAGE }}" }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           MESSAGE: ${{ steps.build-slack-message.outputs.message }}
+
+      - name: Post failure message to a Slack channel
+        if: failure()
+        uses: slackapi/slack-github-action@v1.27.0
+        with:
+          payload: |
+            {
+              "text": "Discussionの取得～通知に失敗しました。"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
