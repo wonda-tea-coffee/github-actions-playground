@@ -3,7 +3,8 @@ name: Test YAML hash comment bug
 on:
   workflow_dispatch:
 
-permissions: {}
+permissions:
+  issues: write
 
 jobs:
   test:
@@ -18,18 +19,22 @@ jobs:
           script: |
             return `### feat: add new feature #123\r\nsome test content\r\n### fix: bug fix #456\r\nmore content here`;
 
-      # ケース1: クォートなし（バグ再現）
-      - name: Without quotes
+      # ケース1: クォートなし
+      - name: Create issue without quotes
         env:
           BODY: ${{ steps.generate.outputs.result }}
+          GH_TOKEN: ${{ github.token }}
         run: |
-          echo "=== Without quotes ==="
-          echo "$BODY"
+          gh issue create --repo "$GITHUB_REPOSITORY" \
+            --title "Test without quotes" \
+            --body "$BODY"
 
-      # ケース2: クォート付き（修正案）
-      - name: With quotes
+      # ケース2: クォート付き
+      - name: Create issue with quotes
         env:
           BODY: "${{ steps.generate.outputs.result }}"
+          GH_TOKEN: ${{ github.token }}
         run: |
-          echo "=== With quotes ==="
-          echo "$BODY"
+          gh issue create --repo "$GITHUB_REPOSITORY" \
+            --title "Test with quotes" \
+            --body "$BODY"
