@@ -1,40 +1,39 @@
-name: Test YAML hash comment bug
+name: Test paths-filter negation extglob
 
 on:
-  workflow_dispatch:
-
-permissions:
-  issues: write
+  pull_request:
+    branches: [develop]
 
 jobs:
-  test:
+  paths-filter:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Generate text with hash
-        id: generate
-        uses: actions/github-script@v7
+      - uses: actions/checkout@v4
+
+      - uses: dorny/paths-filter@v3
+        id: filter
         with:
-          result-encoding: string
-          script: |
-            return `### feat: add new feature #123\r\nsome test content\r\n### fix: bug fix #456\r\nmore content here`;
+          filters: |
+            # パターンA: spec/**だけ
+            spec_all:
+              - 'spec/**'
 
-      # ケース1: クォートなし
-      - name: Create issue without quotes
-        env:
-          BODY: ${{ steps.generate.outputs.result }}
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh issue create --repo "$GITHUB_REPOSITORY" \
-            --title "Test without quotes" \
-            --body "$BODY"
+            # パターンB: 否定パターンで除外
+            spec_exclude_docs_negation:
+              - 'spec/**'
+              - '!spec/docs/**'
 
-      # ケース2: クォート付き
-      - name: Create issue with quotes
-        env:
-          BODY: "${{ steps.generate.outputs.result }}"
-          GH_TOKEN: ${{ github.token }}
+            # パターンC: extglobで除外
+            spec_exclude_docs_extglob:
+              - 'spec/!(docs)/**'
+
+      - name: Show results
         run: |
-          gh issue create --repo "$GITHUB_REPOSITORY" \
-            --title "Test with quotes" \
-            --body "$BODY"
+          echo "spec_all: ${{ steps.filter.outputs.spec_all }}"
+          echo "spec_exclude_docs_negation: ${{ steps.filter.outputs.spec_exclude_docs_negation }}"
+          echo "spec_exclude_docs_extglob: ${{ steps.filter.outputs.spec_exclude_docs_extglob }}"
+          echo "---"
+          echo "spec_all files: ${{ steps.filter.outputs.spec_all_files }}"
+          echo "spec_exclude_docs_negation files: ${{ steps.filter.outputs.spec_exclude_docs_negation_files }}"
+          echo "spec_exclude_docs_extglob files: ${{ steps.filter.outputs.spec_exclude_docs_extglob_files }}"
